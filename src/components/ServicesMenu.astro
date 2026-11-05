@@ -1,0 +1,72 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { IMG } from '../lib/images.js';
+import { CATS, TOTAL_SERVICIOS } from '../data/servicios.js';
+import { wa, money } from '../data/site.js';
+import { u } from '../lib/url.js';
+
+interface Props { showHead?: boolean; initial?: string }
+const { showHead = true, initial = 'rubios' } = Astro.props;
+const norm = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const figs = Object.fromEntries(await Promise.all(CATS.map(async (c) => [c.k, (await getImage({ src: IMG[c.img], width: 900 })).src])));
+const first = CATS.find((c) => c.k === initial) ?? CATS[0];
+const titleHtml = (t: string) => t.replace(/^(\S+)/, '<em>$1</em>');
+---
+<section class="carta wrap" id="carta">
+  {showHead && (
+    <div class="head">
+      <div><span class="eyebrow">Servicios</span><h2 class="h2">Todo lo que <em>hacemos</em>,<br />en un solo menú.</h2></div>
+      <p class="note">Precios desde, según largo y densidad. Los confirmamos tras el diagnóstico, antes de empezar.</p>
+    </div>
+  )}
+  <div class="svc" id="svc">
+    <nav class="cats" id="svcCats" role="tablist" aria-label="Categorías de servicios">
+      {CATS.map((c, i) => (
+        <>
+          {(i === 0 || CATS[i - 1].g !== c.g) && <span class="grp">{c.g}</span>}
+          <button role="tab" id={`t-${c.k}`} data-k={c.k} aria-controls={`p-${c.k}`} aria-selected={String(c.k === first.k)}><b>{c.t}</b><small>{c.items.length}</small></button>
+        </>
+      ))}
+    </nav>
+    <div class="svc-main">
+      <label class="search" for="svcQ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
+        <span class="sr" style="position:absolute;left:-9999px">Buscar servicio</span>
+        <input id="svcQ" type="search" placeholder={`Busca entre ${TOTAL_SERVICIOS} servicios: balayage, keratina, uñas…`} autocomplete="off" />
+        <span class="n" id="svcN">{first.items.length} servicios</span>
+      </label>
+      <div class="svc-results svc-intro"><h3>Resultados para <em id="svcQv"></em></h3></div>
+      {CATS.map((c) => (
+        <div class="svc-panel" id={`p-${c.k}`} role="tabpanel" aria-labelledby={`t-${c.k}`} data-k={c.k} data-t={c.t} data-n={c.items.length} data-img={figs[c.k]} hidden={c.k !== first.k}>
+          <div class="svc-intro">
+            <h3 set:html={titleHtml(c.t)} />
+            <p>{c.d} <a class="more" href={u(`/servicios/${c.slug}/`)}>Ver detalles →</a></p>
+          </div>
+          <ul class="svc-list">
+            {c.items.map(([n, t, p, d], i) => (
+              <li class="svc-row" style={`--i:${i}`} data-q={norm(`${n} ${d} ${c.t}`)}>
+                <div><span class="nm"><span class="cat-l">{c.t}</span>{n}</span></div>
+                <div class="meta">
+                  <span class="pr">{p !== null && p > 0 && <small>desde</small>}{money(p)}</span>
+                  <span class="tm">{t}</span>
+                  <a class="go" href={wa(`Hola, me interesa: ${n}. ¿Qué disponibilidad tienen?`)} target="_blank" rel="noopener">Pedir cita →</a>
+                </div>
+                <p class="ds">{d}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <p class="svc-empty" id="svcEmpty" hidden>No encontramos ese servicio. Escríbenos y te decimos si lo hacemos.</p>
+      <div class="svc-foot"><p>¿No encuentras lo que buscas? Te asesoramos sin compromiso.</p><a class="btn btn-line" href={u('/contacto/')}>Escríbenos</a></div>
+    </div>
+    <figure class="svc-fig" aria-hidden="true">
+      <div class="ph"><Image id="svcImg" src={IMG[first.img]} alt="" width={900} /></div>
+      <figcaption><b id="svcFigT">{first.t}</b><span id="svcFigN">{first.items.length} servicios</span></figcaption>
+    </figure>
+  </div>
+</section>
+<script>
+  import { initServices } from '../scripts/services.js';
+  initServices();
+</script>

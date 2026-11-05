@@ -1,0 +1,59 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import CatCards from '../../components/CatCards.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { BRANCHES } from '../../data/sucursales.js';
+import { wa } from '../../data/site.js';
+import { IMG } from '../../lib/images.js';
+import { salonLD, crumbsLD } from '../../lib/schema.js';
+import { u } from '../../lib/url.js';
+
+export function getStaticPaths() {
+  return BRANCHES.map((b) => ({ params: { slug: b.slug }, props: { b } }));
+}
+const { b } = Astro.props;
+const abs = (p) => new URL(u(p), Astro.site).href;
+const pageUrl = abs(`/sucursales/${b.slug}/`);
+const other = BRANCHES.find((x) => x.slug !== b.slug);
+---
+<Base title={`Salón de belleza en ${b.name}, CDMX`} description={`Max Torrado Salón ${b.name}: corte, balayage, rubios, color, tratamientos, peinado y belleza en la colonia ${b.colonia}, Benito Juárez, CDMX. Horario, teléfono y cómo llegar.`} jsonld={[salonLD(b, { home: abs('/'), pageUrl, image: abs('/og.jpg') }), crumbsLD([['Inicio', abs('/')], ['Sucursales', abs('/sucursales/')], [b.name, pageUrl]])]}>
+  <header class="phead wrap split">
+    <div>
+      <nav class="crumbs" aria-label="Ruta"><a href={u('/')}>Inicio</a><span aria-hidden="true">/</span><a href={u('/sucursales/')}>Sucursales</a><span aria-hidden="true">/</span><span aria-current="page">{b.name}</span></nav>
+      <span class="eyebrow">Sucursal</span>
+      <h1 set:html={b.nameHtml} />
+      <p class="lede">{b.intro}</p>
+      <div class="ctas">
+        <a class="btn btn-gold" href={wa(`Hola, quiero agendar en la sucursal ${b.colonia}.`)} target="_blank" rel="noopener">Agendar aquí</a>
+        <a class="btn btn-line" href={b.maps} target="_blank" rel="noopener">Cómo llegar</a>
+      </div>
+    </div>
+    <div class="ph"><Image src={IMG[b.img]} alt={b.alt} widths={[480, 800, 1200]} sizes="(max-width: 860px) 92vw, 42vw" loading="eager" /></div>
+  </header>
+
+  <section class="wrap block">
+    <div class="bdetail">
+      <div>
+        <span class="eyebrow">Datos de la sucursal</span>
+        <dl style="margin-top:24px">
+          <dt>Dirección</dt><dd>{b.street ?? `Col. ${b.colonia}, alcaldía ${b.locality}, ${b.city}`}</dd>
+          <dt>Teléfono</dt><dd><a href={`tel:${b.phone}`}>{b.phoneLabel}</a></dd>
+          <dt>Horario</dt><dd><table><tbody>{b.hours.map(([d, h]) => <tr><td>{d}</td><td>{h}</td></tr>)}</tbody></table></dd>
+        </dl>
+      </div>
+      <div>
+        <span class="eyebrow">También te puede quedar cerca</span>
+        <h2 class="h3" set:html={other.nameHtml} />
+        <p class="lede" style="font-size:.95rem">{other.intro}</p>
+        <div class="acts"><a class="btn btn-line" href={u(`/sucursales/${other.slug}/`)}>Ver sucursal {other.name}</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap block">
+    <div class="block-head"><div><span class="eyebrow">Servicios en {b.name}</span><h2 class="h3">Todo el menú, en <em>{b.colonia}</em>.</h2></div><a class="btn btn-line" href={u('/servicios/')}>Menú completo</a></div>
+    <CatCards />
+  </section>
+  <CtaBand msg={`Hola, quiero agendar en la sucursal ${b.colonia}.`} />
+</Base>

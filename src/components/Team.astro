@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+import { IMG } from '../lib/images.js';
+import { TEAM, TEAM_FILTERS } from '../data/equipo.js';
+import { catByKey } from '../data/servicios.js';
+import { u } from '../lib/url.js';
+
+interface Props { showHead?: boolean }
+const { showHead = true } = Astro.props;
+---
+<section class="team wrap" id="equipo">
+  {showHead && (
+    <div class="top">
+      <div><span class="eyebrow">El equipo</span><h2 class="h2">Conoce a nuestro <em>equipo</em>.</h2></div>
+      <p class="lede">Detrás de cada resultado hay una persona con su propia especialidad. Así sabes quién hace qué en Max Torrado.</p>
+    </div>
+  )}
+  <div class="filters" id="filters" role="group" aria-label="Filtrar por especialidad">
+    <span class="lbl">Especialidad</span>
+    {TEAM_FILTERS.map(([k, l]) => <button class="chip" data-tf={k} aria-pressed={String(k === 'all')}>{l}</button>)}
+  </div>
+  <div class="cast">
+    <ul class="roll" id="roll">
+      {TEAM.map((p) => <li data-id={p.id}><button><span class="who">{p.n}</span><span class="rl">{p.short}</span></button></li>)}
+    </ul>
+    <div class="card" id="card" aria-live="polite"></div>
+  </div>
+  <div class="deck" id="deck">
+    {TEAM.map((p) => (
+      <article id={p.id} data-id={p.id} data-f={p.f.join(' ')} data-has-img={p.img ? '1' : ''}>
+        <div class={p.img ? 'portrait' : 'portrait color'} data-cursor={p.n.split(' ')[0]}>
+          {p.img
+            ? <Image src={IMG[p.img]} alt={`${p.n}, ${p.r.toLowerCase()} en Max Torrado Salón`} widths={[400, 700, 1000]} sizes="(max-width: 860px) 82vw, 30vw" style={`object-position:${p.pos}`} />
+            : <div class="mono"><span class="logo-foil"></span></div>}
+          <span class="yrs">{p.y}</span>
+        </div>
+        <div class="info">
+          <h3>{p.n}</h3>
+          <div class="role">{p.r}</div>
+          <q>{p.q}</q>
+          <dl><dt>Firma</dt><dd>{p.firma}</dd><dt>Ideal para</dt><dd>{p.ideal}</dd></dl>
+          <div class="tags">{p.tags.map((t) => <span>{t}</span>)}</div>
+          <p class="see">{p.cats.map((k) => { const c = catByKey(k); return <a href={u(`/servicios/${c.slug}/`)}>{c.t}</a>; })}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+  <div class="dots" id="dots" aria-hidden="true">{TEAM.map(() => <i></i>)}</div>
+</section>
+<script>
+  import { initTeam } from '../scripts/team.js';
+  initTeam();
+</script>

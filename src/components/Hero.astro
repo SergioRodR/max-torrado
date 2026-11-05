@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import { IMG } from '../lib/images.js';
+import { wa } from '../data/site.js';
+import { u } from '../lib/url.js';
+---
+<section class="hero wrap" id="hero">
+  <div class="grid">
+    <div class="copy">
+      <span class="eyebrow">Salón de autor · Moderna y Narvarte, CDMX</span>
+      <h1><span class="ln"><span>Belleza</span></span><span class="ln indent"><span>con <em>firma.</em></span></span></h1>
+      <p class="sub">Color, corte y estilismo diseñados para tu rostro, tu textura y tu rutina. Aquí cada estilista firma su trabajo.</p>
+      <div class="ctas">
+        <a class="btn btn-gold" href={wa('Hola, me gustaría agendar una cita en Max Torrado Salón.')} target="_blank" rel="noopener">Reservar mi cita <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+        <a class="btn btn-line" href={u('/equipo/')}>Conocer al equipo</a>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame" id="heroFrame">
+        <Image id="heroImg" src={IMG.hero} alt="Mujer con cabello castaño iluminado en tonos dorados, sobre fondo oscuro" widths={[480, 720, 1000, 1400]} sizes="(max-width: 860px) 84vw, 540px" loading="eager" fetchpriority="high" style="object-position:50% 22%" />
+        <div class="sheen"></div>
+        <span class="tag">Balayage dorado · Valeria</span>
+      </div>
+    </div>
+  </div>
+  <div class="facts">
+    <div><b>+10 años</b><span>en CDMX, con clientas que regresan</span></div>
+    <div><b>Diagnóstico</b><span>capilar incluido en tu primera visita</span></div>
+    <div><b>2 sucursales</b><span>colonia Moderna y Narvarte</span></div>
+  </div>
+</section>
+<script>
+  import { $, RM, FINE } from '../scripts/dom.js';
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  const frame = $('#heroFrame');
+  // reflejo de luz que sigue al cursor (o se mueve solo en táctil)
+  if (FINE) frame.addEventListener('pointermove', (e) => {
+    const r = frame.getBoundingClientRect();
+    frame.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
+    frame.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
+  });
+  else if (!RM) { let t = 0; (function s() { t += 0.006; frame.style.setProperty('--mx', 50 + Math.sin(t) * 40 + '%'); frame.style.setProperty('--my', 30 + Math.cos(t * 0.7) * 20 + '%'); requestAnimationFrame(s); })(); }
+  if (!RM) {
+    gsap.to('#heroImg', { yPercent: 9, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+    gsap.to('.hero h1', { yPercent: -14, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  }
+  // destellos del logo alrededor de la foto
+  const STAR = '<svg viewBox="0 0 24 24"><path d="M12 0c.6 6.4 5 11.4 12 12-7 .6-11.4 5-12 12-.6-7-5-11.4-12-12 7-.6 11.4-5.6 12-12z"/></svg>';
+  [[-4, 14, 16, 0], [97, 4, 11, 1.1], [101, 52, 14, 2], [-5, 70, 9, 0.6], [90, 95, 12, 1.7]].forEach(([x, y, s, d]) => {
+    const e = document.createElement('span');
+    e.className = 'spark'; e.setAttribute('aria-hidden', 'true');
+    e.style.cssText = `left:${x}%;top:${y}%;--s:${s}px;--dl:${d}s`;
+    e.innerHTML = STAR;
+    $('.frame-wrap').appendChild(e);
+  });
+</script>

@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import Loader from '../components/Loader.astro';
+import Thread from '../components/Thread.astro';
+import Hero from '../components/Hero.astro';
+import Manifesto from '../components/Manifesto.astro';
+import ServicesMenu from '../components/ServicesMenu.astro';
+import Team from '../components/Team.astro';
+import Lookbook from '../components/Lookbook.astro';
+import Branches from '../components/Branches.astro';
+import Contact from '../components/Contact.astro';
+import { BRANCHES } from '../data/sucursales.js';
+import { orgLD, salonLD } from '../lib/schema.js';
+import { u } from '../lib/url.js';
+
+const home = new URL(u('/'), Astro.site).href;
+const logo = new URL(u('/icon-512.png'), Astro.site).href;
+const og = new URL(u('/og.jpg'), Astro.site).href;
+const ld = [
+  orgLD(home, logo),
+  ...BRANCHES.map((b) => salonLD(b, { home, pageUrl: new URL(u(`/sucursales/${b.slug}/`), Astro.site).href, image: og })),
+];
+---
+<Base intro jsonld={ld}>
+  <Loader />
+  <Thread />
+  <Hero />
+  <Manifesto />
+  <ServicesMenu />
+  <Team />
+  <Lookbook />
+  <Branches />
+  <Contact />
+</Base>

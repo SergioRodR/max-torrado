@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import Team from '../../components/Team.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { crumbsLD } from '../../lib/schema.js';
+import { u } from '../../lib/url.js';
+const abs = (p) => new URL(u(p), Astro.site).href;
+---
+<Base title="Equipo" description="Conoce al equipo de Max Torrado Salón: coloristas, especialistas en rubios, estilistas de corte, peinado y novias, cejas y maquillaje en CDMX." jsonld={crumbsLD([['Inicio', abs('/')], ['Equipo', abs('/equipo/')]])}>
+  <PageHead crumbs={[['Inicio', '/'], ['Equipo']]} eyebrow="El equipo" title="Conoce a nuestro <em>equipo</em>." lede="Detrás de cada resultado hay una persona con su propia especialidad. Filtra por especialidad para ver quién hace qué en Max Torrado." />
+  <Team showHead={false} />
+  <CtaBand />
+</Base>

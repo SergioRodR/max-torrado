@@ -1,0 +1,44 @@
+---
+import { SITE, wa } from '../data/site.js';
+import { CATS } from '../data/servicios.js';
+import { BRANCHES } from '../data/sucursales.js';
+
+interface Props { headingTag?: 'h1' | 'h2' }
+const { headingTag = 'h2' } = Astro.props;
+const H = headingTag;
+---
+<section class="contact wrap" id="contacto">
+  <div class="cgrid">
+    <div>
+      <span class="eyebrow">Contacto</span>
+      <H class="h2">Hablemos de<br />tu <em>cabello</em>.</H>
+      <ul class="channels">
+        <li><span class="k">WhatsApp</span><a class="v" href={wa()} target="_blank" rel="noopener">{SITE.whatsappLabel}</a></li>
+        {!SITE.instagram.porConfirmar && <li><span class="k">Instagram</span><a class="v" href={SITE.instagram.url} target="_blank" rel="noopener">{SITE.instagram.handle}</a></li>}
+        {!SITE.email.porConfirmar && <li><span class="k">Correo</span><a class="v" href={`mailto:${SITE.email.value}`}>{SITE.email.value}</a></li>}
+        {BRANCHES.map((b) => <li><span class="k">{b.colonia}</span><a class="v" href={`tel:${b.phone}`}>{b.phoneLabel}</a></li>)}
+      </ul>
+    </div>
+    <form class="form" id="cform" novalidate>
+      <div class="field"><label for="cName">Nombre</label><input id="cName" name="nombre" autocomplete="name" required /></div>
+      <div class="field"><label for="cPhone">Teléfono</label><input id="cPhone" name="telefono" type="tel" autocomplete="tel" inputmode="tel" /></div>
+      <div class="field"><label for="cBranch">Sucursal</label><select id="cBranch" name="sucursal"><option>Cualquiera</option>{BRANCHES.map((b) => <option>{b.colonia}</option>)}</select></div>
+      <div class="field"><label for="cSvc">Servicio</label><select id="cSvc" name="servicio"><option>Asesoría</option>{CATS.map((c) => <option>{c.t}</option>)}</select></div>
+      <div class="field full"><label for="cMsg">Mensaje</label><textarea id="cMsg" name="mensaje" placeholder="Cuéntanos qué buscas o comparte tu duda"></textarea></div>
+      <div class="send full"><button class="btn btn-gold" type="submit">Enviar por WhatsApp</button><p>Se abre WhatsApp con tu mensaje listo. Te respondemos en horario de salón.</p><span class="err" id="cErr" role="alert" hidden>Escribe tu nombre para continuar.</span></div>
+    </form>
+  </div>
+</section>
+<script>
+  import { $, WA } from '../scripts/dom.js';
+  const form = $('#cform');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const n = $('#cName').value.trim();
+    $('#cErr').hidden = !!n;
+    if (!n) { $('#cName').focus(); return; }
+    const ph = $('#cPhone').value.trim(), m = $('#cMsg').value.trim();
+    const txt = `Hola, soy ${n}${ph ? ' (' + ph + ')' : ''}. Me interesa: ${$('#cSvc').value}. Sucursal: ${$('#cBranch').value}.${m ? ' ' + m : ''}`;
+    window.open(WA + encodeURIComponent(txt), '_blank', 'noopener');
+  });
+</script>

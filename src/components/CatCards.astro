@@ -1,0 +1,21 @@
+---
+import { Image } from 'astro:assets';
+import { IMG } from '../lib/images.js';
+import { CATS } from '../data/servicios.js';
+import { money } from '../data/site.js';
+import { u } from '../lib/url.js';
+interface Props { exclude?: string }
+const { exclude } = Astro.props;
+const list = CATS.filter((c) => c.k !== exclude);
+const minPrice = (c) => Math.min(...c.items.map((i) => i[2]).filter((p) => p !== null && p > 0));
+---
+<div class="catcards">
+  {list.map((c) => (
+    <a class="catcard rv" href={u(`/servicios/${c.slug}/`)}>
+      <div class="ph"><Image src={IMG[c.img]} alt="" widths={[320, 520, 760]} sizes="(max-width: 600px) 90vw, 25vw" /><span class="n">{c.items.length} servicios</span></div>
+      <h3>{c.t}</h3>
+      <p>{c.d}</p>
+      <span class="from">Desde {money(minPrice(c))}</span>
+    </a>
+  ))}
+</div>

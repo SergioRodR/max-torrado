@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import Lookbook from '../../components/Lookbook.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { crumbsLD } from '../../lib/schema.js';
+import { u } from '../../lib/url.js';
+const abs = (p) => new URL(u(p), Astro.site).href;
+---
+<Base title="Lookbook" description="Looks recientes de Max Torrado Salón: balayage, rubios, cobre, bob, rizos y peinados de evento. Elige un estilo y pide uno similar por WhatsApp." jsonld={crumbsLD([['Inicio', abs('/')], ['Lookbook', abs('/lookbook/')]])}>
+  <PageHead crumbs={[['Inicio', '/'], ['Lookbook']]} eyebrow="Lookbook" title="Encuentra tu <em>próximo</em> look." />
+  <Lookbook showHead={false} />
+  <CtaBand />
+</Base>

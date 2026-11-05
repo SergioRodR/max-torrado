@@ -1,0 +1,57 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { IMG } from '../lib/images.js';
+import { LOOKS, LOOK_FILTERS, lookMsg } from '../data/looks.js';
+import { catByKey } from '../data/servicios.js';
+import { wa } from '../data/site.js';
+import { u } from '../lib/url.js';
+
+interface Props { showHead?: boolean }
+const { showHead = true } = Astro.props;
+const looks = await Promise.all(LOOKS.map(async (l) => ({ ...l, full: (await getImage({ src: IMG[l.img], width: 1400 })).src, slug: catByKey(l.cat).slug })));
+const counts = Object.fromEntries(LOOK_FILTERS.map(([k]) => [k, LOOKS.filter((l) => k === 'all' || l.f === k).length]));
+const pad = (n: number) => String(n).padStart(2, '0');
+const ARR_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
+const ARR_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+---
+<section class="look" id="lookbook">
+  <div class="wrap">
+    <div class="bar">
+      <div>
+        {showHead ? <><span class="eyebrow">Lookbook</span><h2 class="h2">Encuentra tu<br /><em>próximo</em> look.</h2></> : <span class="eyebrow">{LOOKS.length} looks recientes</span>}
+      </div>
+      <div class="ctrls"><button id="lbPrev" aria-label="Look anterior" set:html={ARR_L} /><span class="count" id="lbCount">01 / {pad(LOOKS.length)}</span><button id="lbNext" aria-label="Look siguiente" set:html={ARR_R} /></div>
+    </div>
+    <div class="lfrow">
+      <p class="lede">Toca un look para verlo de cerca: te decimos la técnica, quién lo hizo y cuánto tarda. Si te gusta, pide uno similar.</p>
+      <div class="lfilters" role="group" aria-label="Filtrar looks">
+        {LOOK_FILTERS.map(([k, t]) => <button class="chip" data-lf={k} aria-pressed={String(k === 'all')}>{t} <small>{counts[k]}</small></button>)}
+      </div>
+    </div>
+    <div class="prog"><i id="lbProg"></i></div>
+    <div class="track" id="track">
+      {looks.map((l) => (
+        <figure class="shot" data-f={l.f} data-cat={l.cat} data-slug={l.slug} data-n={l.n} data-tec={l.tec} data-who={l.who} data-tm={l.tm} data-full={l.full}>
+          <button class="ph" data-cursor="Ver" aria-label={`Ver de cerca: ${l.n}`}>
+            <Image src={IMG[l.img]} alt={l.alt} widths={[360, 560, 840]} sizes="(max-width: 899px) 74vw, 27vw" style={l.pos ? `object-position:${l.pos}` : undefined} />
+          </button>
+          <figcaption><div><b>{l.n}</b><span>{l.tec} · {l.who}</span></div><a class="want" href={wa(lookMsg(l))} target="_blank" rel="noopener">Quiero este look</a></figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+<div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="Look ampliado">
+  <button class="x" id="lbClose" aria-label="Cerrar">×</button>
+  <figure><img id="lbImg" alt="" /></figure>
+  <div class="lbbar">
+    <div class="cap" id="lbCap"></div>
+    <div class="lbact"><a class="btn btn-gold" id="lbWant" href="#" target="_blank" rel="noopener">Quiero este look</a><a class="btn btn-line" id="lbSvc" href="#">Ver en el menú</a></div>
+    <div class="ctrls"><button id="lbxPrev" aria-label="Look anterior" set:html={ARR_L} /><button id="lbxNext" aria-label="Look siguiente" set:html={ARR_R} /></div>
+  </div>
+</div>
+<script define:vars={{ servBase: u('/servicios/') }} is:inline>window.__SERV_BASE = servBase;</script>
+<script>
+  import { initLookbook } from '../scripts/lookbook.js';
+  initLookbook();
+</script>

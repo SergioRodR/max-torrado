@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import ServicesMenu from '../../components/ServicesMenu.astro';
+import CatCards from '../../components/CatCards.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { TOTAL_SERVICIOS } from '../../data/servicios.js';
+import { crumbsLD } from '../../lib/schema.js';
+import { u } from '../../lib/url.js';
+const abs = (p) => new URL(u(p), Astro.site).href;
+---
+<Base title="Servicios y precios" description={`Menú completo de ${TOTAL_SERVICIOS} servicios de Max Torrado Salón en CDMX: balayage, rubios, color, corte, tratamientos, peinado, novias, caballero, maquillaje, cejas y uñas.`} jsonld={crumbsLD([['Inicio', abs('/')], ['Servicios', abs('/servicios/')]])}>
+  <PageHead crumbs={[['Inicio', '/'], ['Servicios']]} eyebrow="Servicios" title="El menú <em>completo</em>." lede={`${TOTAL_SERVICIOS} servicios de cabello y belleza con precio desde y duración. Busca por nombre o explora por categoría; el precio final lo confirmamos tras el diagnóstico.`} />
+  <ServicesMenu showHead={false} />
+  <section class="wrap block">
+    <div class="block-head"><div><span class="eyebrow">Por categoría</span><h2 class="h3">Explora cada <em>especialidad</em>.</h2></div></div>
+    <CatCards />
+  </section>
+  <CtaBand />
+</Base>

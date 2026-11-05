@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import { SITE } from '../../data/site.js';
+---
+<Base title="Aviso de privacidad" description="Aviso de privacidad de Max Torrado Salón." noindex>
+  <PageHead crumbs={[['Inicio', '/'], ['Aviso de privacidad']]} title="Aviso de <em>privacidad</em>." />
+  <section class="wrap block" style="padding-top:0">
+    <div class="prose">
+      <p><strong>Borrador para revisión.</strong> Este texto es una base general; debe validarlo el responsable del negocio o su asesor legal antes de publicarse.</p>
+      <h2>Responsable</h2>
+      <p>{SITE.name}, con sucursales en las colonias Moderna y Narvarte, alcaldía Benito Juárez, Ciudad de México, es responsable del tratamiento de los datos personales que nos proporcionas.</p>
+      <h2>Datos que recabamos</h2>
+      <p>Nombre, teléfono y la información que decidas compartir al escribirnos (servicio de interés, sucursal y mensaje). Este sitio no guarda formularios: al enviarlos se abre WhatsApp con tu mensaje y la conversación se rige por las políticas de esa plataforma.</p>
+      <h2>Finalidades</h2>
+      <p>Atender tus solicitudes de información, agendar y confirmar citas, y darte seguimiento sobre los servicios contratados.</p>
+      <h2>Derechos ARCO</h2>
+      <p>Puedes solicitar el acceso, rectificación, cancelación u oposición al uso de tus datos escribiéndonos por WhatsApp al {SITE.whatsappLabel}.</p>
+      <h2>Cambios a este aviso</h2>
+      <p>Cualquier cambio se publicará en esta misma página.</p>
+    </div>
+  </section>
+</Base>

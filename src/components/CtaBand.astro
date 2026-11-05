@@ -1,0 +1,15 @@
+---
+import { wa } from '../data/site.js';
+import { u } from '../lib/url.js';
+interface Props { title?: string; text?: string; msg?: string }
+const { title = '¿Lista para tu <em>próximo</em> look?', text = 'Escríbenos por WhatsApp y te ayudamos a elegir servicio, sucursal y horario.', msg = 'Hola, me gustaría agendar una cita en Max Torrado Salón.' } = Astro.props;
+---
+<section class="wrap block">
+  <div class="cta-band">
+    <div><h2 set:html={title} /><p>{text}</p></div>
+    <div class="acts">
+      <a class="btn btn-gold" href={wa(msg)} target="_blank" rel="noopener">Reservar por WhatsApp</a>
+      <a class="btn btn-line" href={u('/sucursales/')}>Ver sucursales</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,30 @@
+---
+import { Image } from 'astro:assets';
+import { IMG } from '../lib/images.js';
+import { BRANCHES } from '../data/sucursales.js';
+import { wa } from '../data/site.js';
+import { u } from '../lib/url.js';
+
+interface Props { showHead?: boolean }
+const { showHead = true } = Astro.props;
+---
+<section class="branches wrap" id="sucursales">
+  {showHead && <><span class="eyebrow">Sucursales</span><h2 class="h2">Dos casas,<br />el mismo <em>estándar</em>.</h2></>}
+  <div class="bgrid">
+    {BRANCHES.map((b) => (
+      <article class="branch rv">
+        <a class="ph" href={u(`/sucursales/${b.slug}/`)} aria-label={`Ver sucursal ${b.name}`}><Image src={IMG[b.img]} alt={b.alt} widths={[600, 900, 1300]} sizes="(max-width: 860px) 92vw, 45vw" /></a>
+        <h3 set:html={b.nameHtml} />
+        <dl>
+          <dt>Dirección</dt><dd>{b.street ?? `Col. ${b.colonia}, ${b.locality}, CDMX`}</dd>
+          <dt>Horario</dt><dd>{b.hours.filter(([, h]) => h !== 'Cerrado').map(([d, h]) => `${d} ${h}`).join(' · ')}</dd>
+          <dt>Teléfono</dt><dd><a href={`tel:${b.phone}`}>{b.phoneLabel}</a></dd>
+        </dl>
+        <div class="acts">
+          <a class="btn btn-line" href={b.maps} target="_blank" rel="noopener">Cómo llegar</a>
+          <a class="btn btn-gold" href={wa(`Hola, quiero agendar en la sucursal ${b.colonia}.`)} target="_blank" rel="noopener">Agendar aquí</a>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

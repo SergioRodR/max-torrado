@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+# material de trabajo que no se publica
+version-anterior/node_modules/
+version-anterior/dist/
+propuesta/_preview.html
+capturas/
+referencias/

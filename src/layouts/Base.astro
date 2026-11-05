@@ -1,0 +1,125 @@
+---
+import '../styles/global.css';
+import '../styles/pages.css';
+import { SITE, wa } from '../data/site.js';
+import { u } from '../lib/url.js';
+import { BRANCHES } from '../data/sucursales.js';
+import { CATS } from '../data/servicios.js';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  jsonld?: object | object[];
+  intro?: boolean;
+  noindex?: boolean;
+}
+const { title, description = SITE.description, image, jsonld, intro = false, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | Salón de belleza de autor en Moderna y Narvarte, CDMX`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image ?? u('/og.jpg'), Astro.site).href;
+const path = Astro.url.pathname;
+const NAV = [
+  ['/servicios/', 'Servicios'], ['/equipo/', 'Equipo'], ['/lookbook/', 'Lookbook'],
+  ['/sucursales/', 'Sucursales'], ['/contacto/', 'Contacto'],
+];
+const isCurrent = (href: string) => path === u(href) || path.startsWith(u(href));
+const ld = jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [];
+const year = new Date().getFullYear();
+const footCats = CATS.filter((c) => ['rubios', 'color', 'corte', 'trat', 'novias'].includes(c.k));
+---
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  {noindex && <meta name="robots" content="noindex" />}
+  <meta name="theme-color" content="#130e0c" />
+  <link rel="icon" type="image/png" sizes="32x32" href={u('/favicon-32.png')} />
+  <link rel="apple-touch-icon" href={u('/apple-touch-icon.png')} />
+  <link rel="sitemap" href={u('/sitemap-index.xml')} />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_MX" />
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..800&family=Instrument+Sans:wght@400;500;600&display=swap" />
+  <script is:inline define:vars={{ intro }}>
+    var d = document.documentElement; d.classList.add('js');
+    try { if (!intro || sessionStorage.getItem('mt-intro')) d.classList.add('noload'); } catch (e) { d.classList.add('noload'); }
+  </script>
+  {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cur" id="cur" aria-hidden="true"><span>Ver</span></div>
+
+  <header class="nav" id="nav">
+    <div class="wrap in">
+      <a href={u('/')} class="brand" aria-label={`${SITE.name}, inicio`}><span class="logo-foil"></span></a>
+      <nav aria-label="Principal"><ul>
+        {NAV.map(([href, label]) => <li><a href={u(href)} aria-current={isCurrent(href) ? 'page' : undefined}>{label}</a></li>)}
+      </ul></nav>
+      <div class="right">
+        <a class="btn btn-gold" href={wa()} target="_blank" rel="noopener">Reservar</a>
+        <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="menu wrap" id="menu" role="dialog" aria-modal="true" aria-label="Menú">
+    <button class="close" id="menuClose" aria-label="Cerrar menú">×</button>
+    <a class="big" href={u('/')}>Inicio</a>
+    {NAV.map(([href, label]) => <a class="big" href={u(href)}>{label}</a>)}
+    <div class="meta"><span>Moderna · Narvarte, CDMX</span><span>WhatsApp {SITE.whatsappLabel}</span></div>
+  </div>
+
+  <main id="contenido">
+    <slot />
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span class="logo-foil live bigmark" id="bigmark" role="img" aria-label={SITE.name}></span>
+      <div class="cols">
+        <div><h4>Servicios</h4><ul>
+          {footCats.map((c) => <li><a href={u(`/servicios/${c.slug}/`)}>{c.t}</a></li>)}
+          <li><a href={u('/servicios/')}>Menú completo</a></li>
+        </ul></div>
+        <div><h4>Salón</h4><ul>
+          <li><a href={u('/equipo/')}>Equipo</a></li>
+          <li><a href={u('/lookbook/')}>Lookbook</a></li>
+          <li><a href={u('/contacto/')}>Contacto</a></li>
+        </ul></div>
+        <div><h4>Sucursales</h4><ul>
+          {BRANCHES.map((b) => <li><a href={u(`/sucursales/${b.slug}/`)}>{b.name}</a></li>)}
+        </ul></div>
+        <div><h4>Contacto</h4><ul>
+          <li><a href={wa()} target="_blank" rel="noopener">WhatsApp {SITE.whatsappLabel}</a></li>
+          <li><a href={`tel:${SITE.phone}`}>Tel. {SITE.phoneLabel}</a></li>
+          {!SITE.instagram.porConfirmar && <li><a href={SITE.instagram.url} target="_blank" rel="noopener">Instagram</a></li>}
+        </ul></div>
+      </div>
+      <div class="row">
+        <span>© {year} {SITE.name} · Moderna y Narvarte, CDMX</span>
+        <nav aria-label="Legal"><a href={u('/aviso-de-privacidad/')}>Aviso de privacidad</a></nav>
+      </div>
+    </div>
+  </footer>
+
+  <div class="dock" id="dock"><a class="btn btn-gold" href={wa()} target="_blank" rel="noopener">Reservar por WhatsApp</a></div>
+
+  <script>
+    import '../scripts/global.js';
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+---
+// Línea dorada que acompaña el scroll de la home (curvas continuas, sin quiebres).
+---
+<div class="thread" id="thread" aria-hidden="true">
+  <svg id="threadSvg" preserveAspectRatio="none">
+    <defs><linearGradient id="threadGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e9cb" /><stop offset=".5" stop-color="#b8844f" /><stop offset="1" stop-color="#e2c58f" /></linearGradient></defs>
+    <path id="threadPath" d=""></path>
+    <circle class="tip" id="threadTip" r="2.6" cx="-10" cy="-10"></circle>
+  </svg>
+</div>
+<script>
+  import { buildThread } from '../scripts/thread.js';
+  buildThread();
+</script>

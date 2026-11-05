@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { u } from '../lib/url.js';
+---
+<Base title="Página no encontrada" noindex>
+  <section class="wrap nf">
+    <span class="eyebrow">Error 404</span>
+    <h1 class="h2">Este look <em>no existe</em>.</h1>
+    <p class="lede">La página que buscas se movió o ya no está. Te llevamos de vuelta.</p>
+    <div class="ctas"><a class="btn btn-gold" href={u('/')}>Ir al inicio</a><a class="btn btn-line" href={u('/servicios/')}>Ver servicios</a></div>
+  </section>
+</Base>

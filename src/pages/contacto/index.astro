@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import Contact from '../../components/Contact.astro';
+import Branches from '../../components/Branches.astro';
+import { crumbsLD } from '../../lib/schema.js';
+import { u } from '../../lib/url.js';
+const abs = (p) => new URL(u(p), Astro.site).href;
+---
+<Base title="Contacto y citas" description="Agenda tu cita en Max Torrado Salón por WhatsApp o llámanos. Sucursales en la colonia Moderna y Narvarte, CDMX." jsonld={crumbsLD([['Inicio', abs('/')], ['Contacto', abs('/contacto/')]])}>
+  <div class="contact-page">
+    <Contact headingTag="h1" />
+  </div>
+  <Branches />
+</Base>

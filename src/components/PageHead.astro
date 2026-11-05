@@ -1,0 +1,20 @@
+---
+// Encabezado de páginas internas con migas de pan.
+import { u } from '../lib/url.js';
+interface Props { crumbs: [string, string?][]; eyebrow?: string; title: string; lede?: string }
+const { crumbs, eyebrow, title, lede } = Astro.props;
+---
+<header class="phead wrap">
+  <nav class="crumbs" aria-label="Ruta">
+    {crumbs.map(([label, href], i) => (
+      <>
+        {i > 0 && <span aria-hidden="true">/</span>}
+        {href ? <a href={u(href)}>{label}</a> : <span aria-current="page">{label}</span>}
+      </>
+    ))}
+  </nav>
+  {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+  <h1 set:html={title} />
+  {lede && <p class="lede">{lede}</p>}
+  <slot />
+</header>

@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import CatCards from '../../components/CatCards.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { CATS } from '../../data/servicios.js';
+import { TEAM } from '../../data/equipo.js';
+import { LOOKS, lookMsg } from '../../data/looks.js';
+import { wa, money } from '../../data/site.js';
+import { IMG } from '../../lib/images.js';
+import { catalogLD, crumbsLD } from '../../lib/schema.js';
+import { u } from '../../lib/url.js';
+
+export function getStaticPaths() {
+  return CATS.map((c) => ({ params: { slug: c.slug }, props: { c } }));
+}
+const { c } = Astro.props;
+const abs = (p) => new URL(u(p), Astro.site).href;
+const pageUrl = abs(`/servicios/${c.slug}/`);
+const people = TEAM.filter((p) => p.cats.includes(c.k));
+const looks = LOOKS.filter((l) => l.cat === c.k);
+const prices = c.items.map((i) => i[2]).filter((p) => p !== null && p > 0);
+const from = prices.length ? Math.min(...prices) : null;
+const titleHtml = c.t.replace(/^(\S+)/, '<em>$1</em>');
+---
+<Base title={`${c.t} en CDMX`} description={c.seo} jsonld={[catalogLD(c, pageUrl), crumbsLD([['Inicio', abs('/')], ['Servicios', abs('/servicios/')], [c.t, pageUrl]])]}>
+  <header class="phead wrap split">
+    <div>
+      <nav class="crumbs" aria-label="Ruta"><a href={u('/')}>Inicio</a><span aria-hidden="true">/</span><a href={u('/servicios/')}>Servicios</a><span aria-hidden="true">/</span><span aria-current="page">{c.t}</span></nav>
+      <span class="eyebrow">{c.g}</span>
+      <h1 set:html={titleHtml} />
+      <p class="lede">{c.long}</p>
+      <div class="facts-mini">
+        <div><b>{c.items.length}</b>servicios</div>
+        {from && <div><b>{money(from)}</b>precio desde</div>}
+        {people.length > 0 && <div><b>{people.length}</b>{people.length === 1 ? 'especialista' : 'especialistas'}</div>}
+      </div>
+      <div class="ctas">
+        <a class="btn btn-gold" href={wa(`Hola, me interesa un servicio de ${c.t.toLowerCase()}. ¿Me pueden asesorar?`)} target="_blank" rel="noopener">Pedir cita</a>
+        <a class="btn btn-line" href="#lista">Ver servicios y precios</a>
+      </div>
+    </div>
+    <div class="ph"><Image src={IMG[c.img]} alt="" widths={[480, 800, 1200]} sizes="(max-width: 860px) 92vw, 42vw" loading="eager" /></div>
+  </header>
+
+  <section class="wrap block" id="lista">
+    <div class="block-head"><div><span class="eyebrow">Servicios y precios</span><h2 class="h3">Lo que incluye <em>{c.t.toLowerCase()}</em>.</h2></div></div>
+    <ul class="svc-list list-wrap">
+      {c.items.map(([n, t, p, d], i) => (
+        <li class="svc-row" style={`--i:${i}`}>
+          <div><h3 class="nm" style="margin:0;font-weight:400">{n}</h3></div>
+          <div class="meta">
+            <span class="pr">{p !== null && p > 0 && <small>desde</small>}{money(p)}</span>
+            <span class="tm">{t}</span>
+            <a class="go" href={wa(`Hola, me interesa: ${n}. ¿Qué disponibilidad tienen?`)} target="_blank" rel="noopener">Pedir cita →</a>
+          </div>
+          <p class="ds">{d}</p>
+        </li>
+      ))}
+    </ul>
+    <p class="lede" style="font-size:.9rem;margin-top:22px">Precios desde, según largo y densidad del cabello. Confirmamos el precio final tras el diagnóstico, antes de empezar.</p>
+  </section>
+
+  {people.length > 0 && (
+    <section class="wrap block">
+      <div class="block-head"><div><span class="eyebrow">Especialistas</span><h2 class="h3">Quién lo <em>hace</em>.</h2></div><a class="btn btn-line" href={u('/equipo/')}>Todo el equipo</a></div>
+      <div class="mteam">
+        {people.map((p) => (
+          <a href={u(`/equipo/#${p.id}`)}>
+            <div class={p.img ? 'portrait' : 'portrait color'}>
+              {p.img ? <Image src={IMG[p.img]} alt={p.n} widths={[320, 560]} sizes="(max-width: 600px) 90vw, 22vw" style={`object-position:${p.pos}`} /> : <div class="mono"><span class="logo-foil"></span></div>}
+              <span class="yrs">{p.y}</span>
+            </div>
+            <div><b>{p.n}</b><span>{p.r}</span></div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {looks.length > 0 && (
+    <section class="wrap block">
+      <div class="block-head"><div><span class="eyebrow">Lookbook</span><h2 class="h3">Looks de <em>{c.t.toLowerCase()}</em>.</h2></div><a class="btn btn-line" href={u('/lookbook/')}>Ver el lookbook</a></div>
+      <div class="lgrid">
+        {looks.map((l) => (
+          <figure class="shot">
+            <div class="ph"><Image src={IMG[l.img]} alt={l.alt} widths={[360, 600]} sizes="(max-width: 600px) 90vw, 25vw" style={l.pos ? `object-position:${l.pos}` : undefined} /></div>
+            <figcaption><div><b>{l.n}</b><span>{l.tec} · {l.who}</span></div><a class="want" href={wa(lookMsg(l))} target="_blank" rel="noopener">Quiero este look</a></figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="wrap block">
+    <div class="block-head"><div><span class="eyebrow">Otros servicios</span><h2 class="h3">Sigue <em>explorando</em>.</h2></div></div>
+    <CatCards exclude={c.k} />
+  </section>
+  <CtaBand msg={`Hola, me interesa un servicio de ${c.t.toLowerCase()}. ¿Qué disponibilidad tienen?`} />
+</Base>

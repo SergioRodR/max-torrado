@@ -1,0 +1,17 @@
+---
+// Intro de la home: la firma dorada se escribe y se abre como telón. Sólo la primera visita de la sesión.
+---
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="pane t"></div><div class="pane b"></div>
+  <div class="mark"><span class="logo-foil"></span><div class="bar"></div></div>
+</div>
+<script>
+  const loader = document.getElementById('loader');
+  const root = document.documentElement;
+  if (root.classList.contains('noload')) loader.classList.add('gone');
+  else {
+    try { sessionStorage.setItem('mt-intro', '1'); } catch (e) {}
+    setTimeout(() => loader.classList.add('done'), 1500);
+    setTimeout(() => loader.classList.add('gone'), 2700);
+  }
+</script>
